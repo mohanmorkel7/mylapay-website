@@ -247,7 +247,7 @@ export const handleContactUs: RequestHandler = async (req, res) => {
 
     const html = renderEmail({
       title: "Contact Us Submission",
-      intro: `You received a new inquiry via the website contact form.",
+      intro: `You received a new inquiry via the website contact form.`,
       fieldsHtml: fields,
       footerNote: "Reply directly to the sender to continue the conversation.",
     });
@@ -285,7 +285,7 @@ export const handleApplyJob: RequestHandler = async (req, res) => {
 
     const html = renderEmail({
       title: "New Job Application",
-      intro: `A new job application was submitted via the careers page.",
+      intro: `A new job application was submitted via the careers page.`,
       fieldsHtml: fields,
       footerNote: "Use the links above to view the candidate's profile and resume.",
     });
