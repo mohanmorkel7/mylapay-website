@@ -22,9 +22,19 @@ export function createServer() {
   app.get("/api/demo", handleDemo);
 
   // Mail routes
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 6 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowed = ["application/pdf", "application/msword"];
+      if (allowed.includes(file.mimetype)) cb(null, true);
+      else cb(new Error("Unsupported file type. Only PDF and DOC are allowed."));
+    },
+  });
+
   app.post("/api/sendmail/schedule", handleScheduleDemo);
   app.post("/api/sendmail/contact", handleContactUs);
-  app.post("/api/sendmail/apply-job", handleApplyJob);
+  app.post("/api/sendmail/apply-job", upload.single("resume"), handleApplyJob);
 
   return app;
 }
