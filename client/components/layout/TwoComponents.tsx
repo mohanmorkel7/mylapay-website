@@ -6,11 +6,11 @@ import { CheckCircle, CloudCheck, Shield, ArrowBigUpDash } from "lucide-react";
 
 // Card network logos
 import networkCertificates1 from "@/pages/assets/cardnetworks/MasterCard.png";
-import networkCertificates2 from "@/pages/assets/cardNetworks/amex.png";
-import networkCertificates3 from "@/pages/assets/cardNetworks/juspay.jpg";
-import networkCertificates4 from "@/pages/assets/cardNetworks/razorpay.png";
-import networkCertificates5 from "@/pages/assets/cardNetworks/rupay.png";
-import networkCertificates6 from "@/pages/assets/cardNetworks/visa.png";
+import networkCertificates2 from "@/pages/assets/cardnetworks/amex.png";
+import networkCertificates3 from "@/pages/assets/cardnetworks/juspay.jpg";
+import networkCertificates4 from "@/pages/assets/cardnetworks/razorpay.png";
+import networkCertificates5 from "@/pages/assets/cardnetworks/rupay.png";
+import networkCertificates6 from "@/pages/assets/cardnetworks/visa.png";
 
 // Global certificates
 import GCert1 from "@/pages/assets/certificates/cc1.png";
