@@ -78,7 +78,12 @@ export const handleScheduleDemo: RequestHandler = async (req, res) => {
     `;
     const text = `Schedule a Demo Request\nTitle: ${data.demoTitle}\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nCompany: ${data.company}\nDate: ${data.date}\nTime: ${data.time}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
@@ -104,7 +109,12 @@ export const handleContactUs: RequestHandler = async (req, res) => {
     `;
     const text = `Contact Us Submission\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nMessage: ${data.message}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
