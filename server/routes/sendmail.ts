@@ -75,12 +75,12 @@ function fieldRow(label: string, value: string): string {
   return `
     <tr>
       <td style="padding:8px 0;color:${TEXT_MUTED};font-size:12px;letter-spacing:.02em;text-transform:uppercase">${escapeHtml(
-        label
+        label,
       )}</td>
     </tr>
     <tr>
       <td style="padding:0 0 16px 0;font-size:16px;color:#111827;font-weight:600">${escapeHtml(
-        value
+        value,
       )}</td>
     </tr>
   `;
@@ -112,7 +112,7 @@ function renderEmail(opts: {
 </head>
 <body style="margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${escapeHtml(
-    preheader
+    preheader,
   )}</div>
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f7fb;padding:24px 0">
     <tr>
@@ -133,7 +133,7 @@ function renderEmail(opts: {
           <tr>
             <td style="padding:28px 28px 10px 28px">
               <h1 class="title" style="margin:0 0 6px 0;font-size:24px;line-height:1.3;color:#111827">${escapeHtml(
-                opts.title
+                opts.title,
               )}</h1>
               <p class="muted" style="margin:0;color:${TEXT_MUTED};font-size:14px;line-height:1.6">${opts.intro}</p>
             </td>
@@ -156,7 +156,7 @@ function renderEmail(opts: {
                 <tr>
                   <td>
                     <a href="mailto:${escapeHtml(
-                      getEnv("SES_DESTINATION_EMAIL")
+                      getEnv("SES_DESTINATION_EMAIL"),
                     )}" style="display:inline-block;background:${BRAND_PRIMARY};color:#ffffff;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px">Reply</a>
                   </td>
                 </tr>
@@ -201,7 +201,12 @@ export const handleScheduleDemo: RequestHandler = async (req, res) => {
 
     const text = `Schedule a Demo Request\nTitle: ${data.demoTitle}\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nCompany: ${data.company}\nDate: ${data.date}\nTime: ${data.time}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
@@ -232,7 +237,12 @@ export const handleContactUs: RequestHandler = async (req, res) => {
 
     const text = `Contact Us Submission\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nMessage: ${data.message}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
