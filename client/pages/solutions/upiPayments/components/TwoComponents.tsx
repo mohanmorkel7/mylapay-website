@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 // Card network logos
-import networkCertificates1 from "../../../assets/cardNetworks/MasterCard.png";
-import networkCertificates2 from "../../../assets/cardNetworks/amex.png";
-import networkCertificates3 from "../../../assets/cardNetworks/juspay.jpg";
-import networkCertificates4 from "../../../assets/cardNetworks/razorpay.png";
-import networkCertificates5 from "../../../assets/cardNetworks/rupay.png";
-import networkCertificates6 from "../../../assets/cardNetworks/visa.png";
+import networkCertificates1 from "../../../assets/cardnetworks/MasterCard.png";
+import networkCertificates2 from "../../../assets/cardnetworks/amex.png";
+import networkCertificates3 from "../../../assets/cardnetworks/juspay.jpg";
+import networkCertificates4 from "../../../assets/cardnetworks/razorpay.png";
+import networkCertificates5 from "../../../assets/cardnetworks/rupay.png";
+import networkCertificates6 from "../../../assets/cardnetworks/visa.png";
 
 // Global certificates
 import GCert1 from "../../../assets/certificates/cc1.png";
