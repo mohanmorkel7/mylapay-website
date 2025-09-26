@@ -2,7 +2,11 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { handleScheduleDemo, handleContactUs, handleApplyJob } from "./routes/sendmail";
+import {
+  handleScheduleDemo,
+  handleContactUs,
+  handleApplyJob,
+} from "./routes/sendmail";
 import multer from "multer";
 
 export function createServer() {
@@ -28,7 +32,8 @@ export function createServer() {
     fileFilter: (_req, file, cb) => {
       const allowed = ["application/pdf", "application/msword"];
       if (allowed.includes(file.mimetype)) cb(null, true);
-      else cb(new Error("Unsupported file type. Only PDF and DOC are allowed."));
+      else
+        cb(new Error("Unsupported file type. Only PDF and DOC are allowed."));
     },
   });
 

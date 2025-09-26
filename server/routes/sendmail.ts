@@ -1,5 +1,9 @@
 import { RequestHandler } from "express";
-import { SESClient, SendEmailCommand, SendRawEmailCommand } from "@aws-sdk/client-ses";
+import {
+  SESClient,
+  SendEmailCommand,
+  SendRawEmailCommand,
+} from "@aws-sdk/client-ses";
 import { z } from "zod";
 
 const BRAND_PRIMARY = "#2baee3";
@@ -77,7 +81,13 @@ async function sendEmail(params: {
   return res.MessageId;
 }
 
-async function sendRawEmail(params: { subject: string; html: string; text: string; replyTo?: string; attachment?: { filename: string; contentType: string; data: Buffer } }): Promise<string | undefined> {
+async function sendRawEmail(params: {
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+  attachment?: { filename: string; contentType: string; data: Buffer };
+}): Promise<string | undefined> {
   const Source = getEnv("SES_SOURCE_EMAIL");
   const DestinationEmail = getEnv("SES_DESTINATION_EMAIL");
   const ses = createSesClient();
@@ -90,7 +100,9 @@ async function sendRawEmail(params: { subject: string; html: string; text: strin
     `MIME-Version: 1.0`,
     `Content-Type: multipart/mixed; boundary="${boundaryMixed}"`,
     params.replyTo ? `Reply-To: ${params.replyTo}` : undefined,
-  ].filter(Boolean).join("\r\n");
+  ]
+    .filter(Boolean)
+    .join("\r\n");
   const altPart = [
     `--${boundaryMixed}`,
     `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
@@ -111,7 +123,9 @@ async function sendRawEmail(params: { subject: string; html: string; text: strin
   ].join("\r\n");
   let mixedBody = `${headers}\r\n\r\n${altPart}`;
   if (params.attachment) {
-    const base64 = params.attachment.data.toString("base64").replace(/.{76}/g, "$&\n");
+    const base64 = params.attachment.data
+      .toString("base64")
+      .replace(/.{76}/g, "$&\n");
     const attPart = [
       ``,
       `--${boundaryMixed}`,
@@ -125,7 +139,13 @@ async function sendRawEmail(params: { subject: string; html: string; text: strin
   }
   mixedBody += `\r\n--${boundaryMixed}--`;
   const raw = new TextEncoder().encode(mixedBody);
-  const res = await ses.send(new SendRawEmailCommand({ RawMessage: { Data: raw }, Source, Destinations: [DestinationEmail] }));
+  const res = await ses.send(
+    new SendRawEmailCommand({
+      RawMessage: { Data: raw },
+      Source,
+      Destinations: [DestinationEmail],
+    }),
+  );
   return res.MessageId;
 }
 
@@ -275,7 +295,12 @@ export const handleScheduleDemo: RequestHandler = async (req, res) => {
 
     const text = `Schedule a Demo Request\nTitle: ${data.demoTitle}\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nCompany: ${data.company}\nDate: ${data.date}\nTime: ${data.time}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
@@ -306,7 +331,12 @@ export const handleContactUs: RequestHandler = async (req, res) => {
 
     const text = `Contact Us Submission\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nMessage: ${data.message}`;
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
@@ -339,7 +369,8 @@ export const handleApplyJob: RequestHandler = async (req, res) => {
       title: "New Job Application",
       intro: `A new job application was submitted via the careers page.`,
       fieldsHtml: fields,
-      footerNote: "Use the links above to view the candidate's profile and resume.",
+      footerNote:
+        "Use the links above to view the candidate's profile and resume.",
     });
 
     const text = `Job Application\nJob Title: ${data.job_title}\nJob ID: ${data.job_id}\nDepartment: ${data.department}\nLocation: ${data.location}\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nLinkedIn: ${data.linkedin}\nPortfolio: ${data.portfolio}\nResume URL: ${data.resume_url}\nMessage: ${data.message}`;
@@ -348,14 +379,34 @@ export const handleApplyJob: RequestHandler = async (req, res) => {
     if (file) {
       const allowed = ["application/pdf", "application/msword"];
       if (!allowed.includes(file.mimetype)) {
-        return res.status(400).json({ ok: false, error: "Unsupported file type. Only PDF and DOC are allowed." });
+        return res
+          .status(400)
+          .json({
+            ok: false,
+            error: "Unsupported file type. Only PDF and DOC are allowed.",
+          });
       }
-      const attachment = { filename: file.originalname, contentType: file.mimetype, data: file.buffer };
-      const messageId = await sendRawEmail({ subject, html, text, replyTo: data.email, attachment });
+      const attachment = {
+        filename: file.originalname,
+        contentType: file.mimetype,
+        data: file.buffer,
+      };
+      const messageId = await sendRawEmail({
+        subject,
+        html,
+        text,
+        replyTo: data.email,
+        attachment,
+      });
       return res.json({ ok: true, messageId });
     }
 
-    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+    const messageId = await sendEmail({
+      subject,
+      html,
+      text,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
