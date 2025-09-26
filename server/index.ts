@@ -23,6 +23,7 @@ export function createServer() {
   // Mail routes
   app.post("/api/sendmail/schedule", handleScheduleDemo);
   app.post("/api/sendmail/contact", handleContactUs);
+  app.post("/api/sendmail/apply-job", handleApplyJob);
 
   return app;
 }
