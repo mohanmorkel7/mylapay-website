@@ -24,6 +24,21 @@ const contactSchema = z.object({
   message: z.string().min(1),
 });
 
+const applyJobSchema = z.object({
+  job_title: z.string().min(1),
+  job_id: z.string().optional().default(""),
+  department: z.string().optional().default(""),
+  location: z.string().optional().default(""),
+  first_name: z.string().min(1),
+  last_name: z.string().min(1),
+  email: z.string().email(),
+  phone_no: z.string().optional().default(""),
+  linkedin: z.string().optional().default(""),
+  portfolio: z.string().optional().default(""),
+  resume_url: z.string().optional().default(""),
+  message: z.string().optional().default(""),
+});
+
 function getEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing environment variable ${name}`);
@@ -84,6 +99,13 @@ function fieldRow(label: string, value: string): string {
       )}</td>
     </tr>
   `;
+}
+
+function rowsFromEntries(entries: Array<[string, string | undefined]>): string {
+  return entries
+    .filter(([, v]) => typeof v === "string" && v.trim() !== "")
+    .map(([l, v]) => fieldRow(l, v as string))
+    .join("");
 }
 
 function renderEmail(opts: {
@@ -182,15 +204,15 @@ export const handleScheduleDemo: RequestHandler = async (req, res) => {
     const data = scheduleSchema.parse(req.body);
 
     const subject = `Schedule a Demo: ${data.demoTitle} — ${data.name} (${data.company})`;
-    const fields = [
-      fieldRow("Title", data.demoTitle),
-      fieldRow("Name", data.name),
-      fieldRow("Email", data.email),
-      fieldRow("Phone", data.phone),
-      fieldRow("Company", data.company),
-      fieldRow("Date", data.date),
-      fieldRow("Time", data.time),
-    ].join("");
+    const fields = rowsFromEntries([
+      ["Title", data.demoTitle],
+      ["Name", data.name],
+      ["Email", data.email],
+      ["Phone", data.phone],
+      ["Company", data.company],
+      ["Date", data.date],
+      ["Time", data.time],
+    ]);
 
     const html = renderEmail({
       title: "Schedule a Demo Request",
@@ -201,12 +223,7 @@ export const handleScheduleDemo: RequestHandler = async (req, res) => {
 
     const text = `Schedule a Demo Request\nTitle: ${data.demoTitle}\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nCompany: ${data.company}\nDate: ${data.date}\nTime: ${data.time}`;
 
-    const messageId = await sendEmail({
-      subject,
-      html,
-      text,
-      replyTo: data.email,
-    });
+    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
@@ -220,29 +237,62 @@ export const handleContactUs: RequestHandler = async (req, res) => {
     const data = contactSchema.parse(req.body);
 
     const subject = `Contact Us: ${data.first_name} ${data.last_name}`;
-    const fields = [
-      fieldRow("First Name", data.first_name),
-      fieldRow("Last Name", data.last_name),
-      fieldRow("Email", data.email),
-      fieldRow("Phone", data.phone_no),
-      fieldRow("Message", data.message),
-    ].join("");
+    const fields = rowsFromEntries([
+      ["First Name", data.first_name],
+      ["Last Name", data.last_name],
+      ["Email", data.email],
+      ["Phone", data.phone_no],
+      ["Message", data.message],
+    ]);
 
     const html = renderEmail({
       title: "Contact Us Submission",
-      intro: `You received a new inquiry via the website contact form.`,
+      intro: `You received a new inquiry via the website contact form.",
       fieldsHtml: fields,
       footerNote: "Reply directly to the sender to continue the conversation.",
     });
 
     const text = `Contact Us Submission\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nMessage: ${data.message}`;
 
-    const messageId = await sendEmail({
-      subject,
-      html,
-      text,
-      replyTo: data.email,
+    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
+
+    res.json({ ok: true, messageId });
+  } catch (err: any) {
+    const message = err?.message || "Failed to send email";
+    res.status(500).json({ ok: false, error: message });
+  }
+};
+
+export const handleApplyJob: RequestHandler = async (req, res) => {
+  try {
+    const data = applyJobSchema.parse(req.body);
+
+    const subject = `Job Application: ${data.job_title} — ${data.first_name} ${data.last_name}`;
+    const fields = rowsFromEntries([
+      ["Job Title", data.job_title],
+      ["Job ID", data.job_id],
+      ["Department", data.department],
+      ["Location", data.location],
+      ["First Name", data.first_name],
+      ["Last Name", data.last_name],
+      ["Email", data.email],
+      ["Phone", data.phone_no],
+      ["LinkedIn", data.linkedin],
+      ["Portfolio", data.portfolio],
+      ["Resume URL", data.resume_url],
+      ["Message", data.message],
+    ]);
+
+    const html = renderEmail({
+      title: "New Job Application",
+      intro: `A new job application was submitted via the careers page.",
+      fieldsHtml: fields,
+      footerNote: "Use the links above to view the candidate's profile and resume.",
     });
+
+    const text = `Job Application\nJob Title: ${data.job_title}\nJob ID: ${data.job_id}\nDepartment: ${data.department}\nLocation: ${data.location}\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nLinkedIn: ${data.linkedin}\nPortfolio: ${data.portfolio}\nResume URL: ${data.resume_url}\nMessage: ${data.message}`;
+
+    const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
 
     res.json({ ok: true, messageId });
   } catch (err: any) {
