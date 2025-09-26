@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { SESClient, SendEmailCommand, SendRawEmailCommand } from "@aws-sdk/client-ses";
 import { z } from "zod";
 
 const BRAND_PRIMARY = "#2baee3";
@@ -74,6 +74,58 @@ async function sendEmail(params: {
   });
 
   const res = await ses.send(command);
+  return res.MessageId;
+}
+
+async function sendRawEmail(params: { subject: string; html: string; text: string; replyTo?: string; attachment?: { filename: string; contentType: string; data: Buffer } }): Promise<string | undefined> {
+  const Source = getEnv("SES_SOURCE_EMAIL");
+  const DestinationEmail = getEnv("SES_DESTINATION_EMAIL");
+  const ses = createSesClient();
+  const boundaryMixed = `mixed_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  const boundaryAlt = `alt_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  const headers = [
+    `From: ${Source}`,
+    `To: ${DestinationEmail}`,
+    `Subject: ${params.subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/mixed; boundary="${boundaryMixed}"`,
+    params.replyTo ? `Reply-To: ${params.replyTo}` : undefined,
+  ].filter(Boolean).join("\r\n");
+  const altPart = [
+    `--${boundaryMixed}`,
+    `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
+    "",
+    `--${boundaryAlt}`,
+    `Content-Type: text/plain; charset=UTF-8`,
+    `Content-Transfer-Encoding: 7bit`,
+    "",
+    params.text,
+    "",
+    `--${boundaryAlt}`,
+    `Content-Type: text/html; charset=UTF-8`,
+    `Content-Transfer-Encoding: 7bit`,
+    "",
+    params.html,
+    "",
+    `--${boundaryAlt}--`,
+  ].join("\r\n");
+  let mixedBody = `${headers}\r\n\r\n${altPart}`;
+  if (params.attachment) {
+    const base64 = params.attachment.data.toString("base64").replace(/.{76}/g, "$&\n");
+    const attPart = [
+      ``,
+      `--${boundaryMixed}`,
+      `Content-Type: ${params.attachment.contentType}; name="${params.attachment.filename}"`,
+      `Content-Disposition: attachment; filename="${params.attachment.filename}"`,
+      `Content-Transfer-Encoding: base64`,
+      "",
+      base64,
+    ].join("\r\n");
+    mixedBody += `\r\n${attPart}`;
+  }
+  mixedBody += `\r\n--${boundaryMixed}--`;
+  const raw = new TextEncoder().encode(mixedBody);
+  const res = await ses.send(new SendRawEmailCommand({ RawMessage: { Data: raw }, Source, Destinations: [DestinationEmail] }));
   return res.MessageId;
 }
 
@@ -291,6 +343,17 @@ export const handleApplyJob: RequestHandler = async (req, res) => {
     });
 
     const text = `Job Application\nJob Title: ${data.job_title}\nJob ID: ${data.job_id}\nDepartment: ${data.department}\nLocation: ${data.location}\nFirst Name: ${data.first_name}\nLast Name: ${data.last_name}\nEmail: ${data.email}\nPhone: ${data.phone_no}\nLinkedIn: ${data.linkedin}\nPortfolio: ${data.portfolio}\nResume URL: ${data.resume_url}\nMessage: ${data.message}`;
+
+    const file = (req as any).file as Express.Multer.File | undefined;
+    if (file) {
+      const allowed = ["application/pdf", "application/msword"];
+      if (!allowed.includes(file.mimetype)) {
+        return res.status(400).json({ ok: false, error: "Unsupported file type. Only PDF and DOC are allowed." });
+      }
+      const attachment = { filename: file.originalname, contentType: file.mimetype, data: file.buffer };
+      const messageId = await sendRawEmail({ subject, html, text, replyTo: data.email, attachment });
+      return res.json({ ok: true, messageId });
+    }
 
     const messageId = await sendEmail({ subject, html, text, replyTo: data.email });
 
