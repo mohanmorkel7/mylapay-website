@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 // Card network logos
-import networkCertificates1 from "../../../assets/cardNetworks/MasterCard.png";
-import networkCertificates2 from "../../../assets/cardNetworks/amex.png";
-import networkCertificates3 from "../../../assets/cardNetworks/juspay.jpg";
-import networkCertificates4 from "../../../assets/cardNetworks/razorpay.png";
-import networkCertificates5 from "../../../assets/cardNetworks/rupay.png";
-import networkCertificates6 from "../../../assets/cardNetworks/visa.png";
+import networkCertificates1 from "../../../assets/cardnetworks/MasterCard.png";
+import networkCertificates2 from "../../../assets/cardnetworks/amex.png";
+import networkCertificates3 from "../../../assets/cardnetworks/juspay.jpg";
+import networkCertificates4 from "../../../assets/cardnetworks/razorpay.png";
+import networkCertificates5 from "../../../assets/cardnetworks/rupay.png";
+import networkCertificates6 from "../../../assets/cardnetworks/visa.png";
 
 // Global certificates
 import GCert1 from "../../../assets/certificates/cc1.png";
@@ -20,9 +20,18 @@ import GCert5 from "../../../assets/certificates/PCI_3DS.png";
 import GCert6 from "../../../assets/certificates/PCIDSS.png";
 
 const features = [
-  { title: "Payment Acceptance", description: "POS and eCommerce payment gateway." },
-  { title: "BIN Sponsorship", description: "Supports both dedicated and shared models" },
-  { title: "Card Networks Connectivity", description: "Integrated with all major global card schemes" },
+  {
+    title: "Payment Acceptance",
+    description: "POS and eCommerce payment gateway.",
+  },
+  {
+    title: "BIN Sponsorship",
+    description: "Supports both dedicated and shared models",
+  },
+  {
+    title: "Card Networks Connectivity",
+    description: "Integrated with all major global card schemes",
+  },
 ];
 
 const globalCertificates = [GCert1, GCert2, GCert3, GCert4, GCert5, GCert6];
@@ -32,7 +41,7 @@ const networkCertificates = [
   networkCertificates3,
   networkCertificates4,
   networkCertificates5,
-  networkCertificates6
+  networkCertificates6,
 ];
 
 export default function SolutionSuite() {
@@ -60,7 +69,8 @@ export default function SolutionSuite() {
             Endless Possibilities
           </h3>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Custom-built to serve varied business needs while empowering every player in the acquiring ecosystem.
+            Custom-built to serve varied business needs while empowering every
+            player in the acquiring ecosystem.
           </p>
         </motion.div>
 
@@ -89,7 +99,9 @@ export default function SolutionSuite() {
                     hovered === idx ? "bg-[#2baee347]" : "bg-blue-100"
                   } opacity-30 pointer-events-none transition-colors duration-200`}
                 ></div>
-                <h4 className="font-bold text-lg mb-1 text-gray-800">{feature.title}</h4>
+                <h4 className="font-bold text-lg mb-1 text-gray-800">
+                  {feature.title}
+                </h4>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
               </motion.div>
             ))}
